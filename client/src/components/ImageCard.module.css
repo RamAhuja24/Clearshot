@@ -1,0 +1,216 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  animation: enter 220ms ease-out;
+}
+
+@keyframes enter {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+.preview {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: var(--surface-2);
+}
+
+.preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.rejected .preview img,
+.blocked .preview img,
+.failed .preview img {
+  filter: saturate(0.6);
+}
+
+.placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 100%;
+  color: var(--text-3);
+  font-size: 12px;
+}
+
+/* A soft light sweep while the photo is queued, uploading or being checked. */
+.scanning {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    transparent 30%,
+    rgb(255 255 255 / 0.28) 50%,
+    transparent 70%
+  );
+  background-size: 250% 100%;
+  animation: sweep 1.6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes sweep {
+  from {
+    background-position: 120% 0;
+  }
+  to {
+    background-position: -120% 0;
+  }
+}
+
+.badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+}
+
+.toolbar {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.card:hover .toolbar,
+.card:focus-within .toolbar {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .toolbar {
+    opacity: 1;
+  }
+}
+
+.iconButton {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.iconButton:hover {
+  background: var(--surface-2);
+}
+
+.progress {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  left: 10px;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.6);
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+  transition: width 150ms linear;
+}
+
+.confirm {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px;
+  background: var(--overlay);
+  color: #fff;
+  font-weight: 600;
+  text-align: center;
+  backdrop-filter: blur(2px);
+}
+
+.confirmActions {
+  display: flex;
+  gap: 8px;
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 14px 14px;
+  min-width: 0;
+}
+
+.name {
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.meta {
+  font-size: 12.5px;
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.reasons {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.reasons li {
+  display: flex;
+  gap: 8px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--text);
+}
+
+.reasonIcon {
+  flex: none;
+  margin-top: 1px;
+  color: var(--danger);
+}
+
+.blocked .reasonIcon {
+  color: var(--warning);
+}
+
+.errorRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--danger-text);
+}

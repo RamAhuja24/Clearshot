@@ -1,0 +1,33 @@
+{
+  "name": "clearshot",
+  "private": true,
+  "type": "module",
+  "description": "Image upload and validation platform: React client, Express API, BullMQ worker, Postgres, S3-compatible storage.",
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "infra:up": "docker compose up -d --wait",
+    "infra:down": "docker compose down",
+    "db:migrate": "npm run migrate -w server",
+    "dev": "concurrently -k -n api,worker,web -c blue,magenta,green \"npm run dev:api -w server\" \"npm run dev:worker -w server\" \"npm run dev -w client\"",
+    "build": "npm run build --workspaces",
+    "typecheck": "npm run typecheck --workspaces",
+    "lint": "eslint .",
+    "test": "npm run test --workspaces",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "concurrently": "^9.2.5",
+    "eslint": "^9.39.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^16.5.0",
+    "prettier": "^3.9.10",
+    "typescript-eslint": "^8.72.1"
+  }
+}

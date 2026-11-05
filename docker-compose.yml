@@ -1,0 +1,62 @@
+# Local infrastructure only. The API, worker and client run on the host via `npm run dev`.
+name: clearshot
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-clearshot}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-clearshot}
+      POSTGRES_DB: ${POSTGRES_DB:-clearshot}
+    ports:
+      - '${POSTGRES_PORT:-5432}:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # Creates the separate database used by integration tests.
+      - ./infra/postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    # AOF keeps queued jobs across restarts; BullMQ requires noeviction.
+    command: ['redis-server', '--appendonly', 'yes', '--maxmemory-policy', 'noeviction']
+    ports:
+      - '${REDIS_PORT:-6379}:6379'
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  # S3-compatible object storage. RustFS is an Apache-2.0 drop-in for MinIO, whose
+  # community images are no longer published. The app only speaks the S3 API, so
+  # AWS S3, Cloudflare R2 or MinIO work by changing the S3_* variables.
+  objectstore:
+    image: rustfs/rustfs:1.0.3
+    environment:
+      RUSTFS_ACCESS_KEY: ${S3_ACCESS_KEY_ID:-clearshot}
+      RUSTFS_SECRET_KEY: ${S3_SECRET_ACCESS_KEY:-clearshot-secret}
+      RUSTFS_ADDRESS: ':9000'
+      RUSTFS_CONSOLE_ENABLE: 'true'
+      RUSTFS_CONSOLE_ADDRESS: ':9001'
+    ports:
+      - '${S3_API_PORT:-9000}:9000'
+      - '${S3_CONSOLE_PORT:-9001}:9001'
+    volumes:
+      - objectdata:/data
+    healthcheck:
+      test: ['CMD-SHELL', 'curl -fsS http://localhost:9000/health >/dev/null || exit 1']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  pgdata:
+  redisdata:
+  objectdata:

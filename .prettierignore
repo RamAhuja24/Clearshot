@@ -1,0 +1,8 @@
+node_modules
+dist
+coverage
+samples
+package-lock.json
+server/models
+server/tests/fixtures
+*.md
